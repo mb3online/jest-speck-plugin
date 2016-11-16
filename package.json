@@ -32,6 +32,6 @@
     "rimraf": "^2.5.4"
   },
   "dependencies": {
-    "mb3-speck": "^1.3.0"
+    "mb3-speck": "^1.3.2"
   }
 }
