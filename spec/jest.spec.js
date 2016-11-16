@@ -26,7 +26,7 @@ describe('Jest Speck Plugin', () => {
     it('should be able to parse interactions from a file.', done => {
         parser.gather(files => {
             const file = files
-        .filter(f => path.basename(f, '.js') === 'index')[0];
+                .filter(f => path.basename(f, '.js') === 'index')[0];
 
             const json = JSON.parse(parser.parseSingleFile(file));
 
@@ -40,7 +40,7 @@ describe('Jest Speck Plugin', () => {
     it('should be able to generate a test shell from a file.', done => {
         parser.gather(files => {
             const file = files
-        .filter(f => path.basename(f, '.js') === 'index')[0];
+                .filter(f => path.basename(f, '.js') === 'index')[0];
 
             const json = JSON.parse(parser.parseSingleFile(file));
 
@@ -73,7 +73,7 @@ describe('Jest Speck Plugin', () => {
 
         parser.gather(files => {
             const file = files
-        .filter(f => path.basename(f, '.js') === 'index')[0];
+                .filter(f => path.basename(f, '.js') === 'index')[0];
 
             const json = parser.parseSingleFile(file);
 
@@ -82,7 +82,7 @@ describe('Jest Speck Plugin', () => {
             expect(fs.lstatSync(path.resolve('spec', 'index.spec.jsx')).isFile()).toBeTruthy();
 
             jestPlugin.run(null,
-        path.resolve('src/plugins', file),
+                path.resolve('src/plugins', file),
                 {
                     'name': 'JestSpeckPlugin',
                     'interactions': [
@@ -107,7 +107,7 @@ describe('Jest Speck Plugin', () => {
     it('should still proceed with an undefined or null location', done => {
         parser.gather(files => {
             const file = files
-        .filter(f => path.basename(f, '.js') === 'index')[0];
+                .filter(f => path.basename(f, '.js') === 'index')[0];
 
             const json = JSON.parse(parser.parseSingleFile(file));
 
@@ -131,7 +131,7 @@ describe('Jest Speck Plugin', () => {
 
         const testFilePath = path.join(__dirname, 'test.jsx');
         const testSpecFilePath =
-      path.join(path.dirname(testFilePath), 'test.spec.jsx');
+            path.join(path.dirname(testFilePath), 'test.spec.jsx');
 
         fs.writeFileSync(testFilePath, JSON.stringify(json));
 
