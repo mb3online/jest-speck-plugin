@@ -20,7 +20,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import mkdirp from 'mkdirp';
 
-import SpeckPlugin from '../speck.plugin';
+import {SpeckPlugin} from 'mb3-speck';
 
 const ZERO = 0;
 
@@ -166,6 +166,13 @@ function parseInteraction(interaction) {
         .trim();
 }
 
+function setupLogger(l) {
+    logger = l || console;
+    if (!logger.skip) logger.skip = () => console.log('Done.');
+    if (!logger.write) logger.write = message => console.log(`Writing: ${message}.`);
+    if (!logger.pass) logger.pass = () => console.log(`Success! 🎉`);
+}
+
 export class JestSpeckPlugin extends SpeckPlugin {
     constructor(testFileLocation = 'base') {
         super();
@@ -178,7 +185,7 @@ export class JestSpeckPlugin extends SpeckPlugin {
 
     run(l, file, json) {
         if (!(json.name || json.interactions)) return;
-        logger = l;
+        setupLogger(l);
         logger.log(`Generating test file for ${json.name}.`);
         const interactions = this.parse(json.interactions || []);
         const output = path.join(path.dirname(file), path.basename(file, path.parse(file).ext));

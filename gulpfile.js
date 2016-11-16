@@ -1,3 +1,5 @@
+require('babel-core/register');
+
 const isparta = require('isparta');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
