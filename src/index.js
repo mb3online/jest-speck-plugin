@@ -173,9 +173,8 @@ function setupLogger(l) {
     if (!logger.pass) logger.pass = () => console.log(`Success! 🎉`);
 }
 
-export class JestSpeckPlugin extends SpeckPlugin {
+export class JestSpeckPlugin {
     constructor(testFileLocation = 'base') {
-        super();
         location = testFileLocation;
     }
 

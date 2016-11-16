@@ -29,9 +29,7 @@
     "gulp-jasmine": "^2.4.1",
     "isparta": "^4.0.0",
     "jasmine": "^2.5.0",
-    "rimraf": "^2.5.4"
-  },
-  "dependencies": {
+    "rimraf": "^2.5.4",
     "mb3-speck": "^1.3.2"
   }
 }
