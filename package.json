@@ -1,0 +1,36 @@
+{
+  "name": "mb3-jest-speck-plugin",
+  "version": "0.0.1",
+  "description": "A plugin for Speck that generates jest test shells",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test",
+    "build": "gulp build; yarn test"
+  },
+  "repository": {
+    "url": "https://github.com/mb3online/jest-speck-plugin",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/mb3online/jest-speck-plugin/issues"
+  },
+  "author": "MB3 Technologies Inc",
+  "contributors": [
+    "Eric Adamski <eric.adamski@mb3online.com>"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-istanbul": "^1.1.1",
+    "gulp-jasmine": "^2.4.1",
+    "isparta": "^4.0.0",
+    "jasmine": "^2.5.0",
+    "rimraf": "^2.5.4"
+  },
+  "dependencies": {
+    "mb3-speck": "^1.2.3"
+  }
+}
