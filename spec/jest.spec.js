@@ -15,15 +15,13 @@ describe('Jest Speck Plugin', () => {
   });
 
   afterAll(() => {
+    const root = path.join(__dirname, '..');
     try {
-      fs.unlinkSync(path.resolve('spec/test.jsx'));
-      fs.unlinkSync(path.resolve('spec/index.spec.jsx'));
-      fs.unlinkSync(path.resolve('src/index.spec.jsx'));
-      rimraf(path.resolve('testing'), err => {/*console.error(err)*/});
-      rimraf(path.resolve('scripts'), err => {/*console.error(err)*/});
-    } catch (e) {
-      /*console.error(e);*/
-    }
+      fs.unlinkSync(path.join(__dirname, 'test.jsx'));
+      fs.unlinkSync(path.join(__dirname, 'index.spec.jsx'));
+      fs.unlinkSync(path.join(root, 'src','index.spec.jsx'))
+      rimraf(path.join(root, 'scripts'), err => {/*console.error(err)*/});
+    } catch (e) { /*console.error(e);*/ }
   });
 
   it('should be able to parse interactions from a file.', done => {
@@ -75,7 +73,6 @@ describe('Jest Speck Plugin', () => {
     const jestPlugin = new JestSpeckPlugin('spec');
 
     parser.gather(files => {
-        console.log(files);
       const file = files
         .filter(f => path.basename(f, '.js') === 'index')[0];
 
