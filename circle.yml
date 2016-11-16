@@ -13,5 +13,5 @@ test:
   override:
     - yarn test
   post:
-    - yarn add -g codeclimate-test-reporter
+    - yarn global codeclimate-test-reporter
     #- codeclimate-test-reporter < coverage/lcov.info
