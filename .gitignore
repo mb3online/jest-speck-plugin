@@ -1,0 +1,6 @@
+node_modules
+*.log
+docs/
+coverage/
+.DS_Store
+.storybook

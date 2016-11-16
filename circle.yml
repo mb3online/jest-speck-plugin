@@ -1,0 +1,10 @@
+general:
+  artifacts:
+    - "coverage"
+machine:
+  node:
+    version: 7.0.0
+test:
+  post:
+      - npm install -g codeclimate-test-reporter
+      - codeclimate-test-reporter < coverage/lcov.info
