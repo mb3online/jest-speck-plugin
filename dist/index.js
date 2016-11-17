@@ -22,6 +22,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          'can create a new test file cleanly.'
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ]
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+/* eslint-disable no-magic-numbers */
 
 
 var _lodash = require('lodash');
@@ -40,35 +41,52 @@ var _mkdirp = require('mkdirp');
 
 var _mkdirp2 = _interopRequireDefault(_mkdirp);
 
-var _mb3Speck = require('mb3-speck');
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ZERO = 0;
-
-var IT_SHELL = '\n\tit(\'<%= interaction %>\', () => {\n\t\t// Arrange\n\n\t\t// Act\n\n\t\t// Assert\n\n\t\tfail(\'Test not implemented.\');\n\t});';
-var DESCRIBE_SHELL_START = '/* eslint-disable */\nimport React from \'react\';\n\nimport { shallow, mount, render } from \'enzyme\';\nimport injectTapEventPlugin from \'react-tap-event-plugin\';\n\nimport <%= className %> from \'<%= relativePath %>\';\n\ninjectTapEventPlugin();\n\ndescribe(\'<%= name %>\', () => {';
-var DESCRIBE_SHELL_FINISH = '\n});\n';
 var JEST_EXTENSION = '.spec.jsx';
 var location = void 0;
 var logger = void 0;
 
+function getTemplate(name) {
+    return fs.readFileSync(path.join(__dirname, 'stubs', name + '.stub')).toString('utf8');
+}
+
+function renderTemplate(template, params) {
+    return _lodash2.default.template(getTemplate(template))(params);
+}
+
 function createItShell(interaction) {
-    return _lodash2.default.template(IT_SHELL)({ interaction: interaction }).replace(/\t/gmi, '    ');
+    return renderTemplate('it-shell', { interaction: interaction }).replace(/\t/gmi, '    ');
 }
 
 function createDescribeShell(name, className, relativePath) {
-    var rlp = relativePath.split('/')[ZERO] === '..' ? relativePath : './' + relativePath;
+    var rlp = relativePath.split('/')[0] === '..' ? relativePath : './' + relativePath;
 
-    return _lodash2.default.template(DESCRIBE_SHELL_START)({
+    return renderTemplate('describe-shell-start', {
         name: name,
         className: className,
         relativePath: rlp
     });
+}
+
+function createRenderTestShell(className) {
+    return renderTemplate('render', { className: className });
+}
+
+function createSubComponentTestShell(className) {
+    return renderTemplate('subcomponents', { className: className });
+}
+
+function createPropTypesShell(className) {
+    return renderTemplate('prop-types', { className: className });
+}
+
+function createDefaultPropTypesShell(className) {
+    return renderTemplate('default-props', { className: className });
 }
 
 function normalizePath(output) {
@@ -85,7 +103,7 @@ function removeShellFinish(code) {
     var splitCode = code.split('\n');
     var end = splitCode.length - LAST;
 
-    return splitCode.splice(ZERO, splitCode[end].charAt(ZERO) === '\n' ? end - SECOND_LAST : end - LAST).reduce(toSingleString);
+    return splitCode.splice(0, splitCode[end].charAt(0) === '\n' ? end - SECOND_LAST : end - LAST).reduce(toSingleString);
 }
 
 function isImplemented(code, interaction) {
@@ -105,10 +123,9 @@ function appendToFile(output, name, its) {
         return isImplemented(code, interaction);
     });
 
-    // something is new
-    if (its.length > ZERO) {
+    if (its.length > 0) {
         code += its.map(createItShell).reduce(toSingleString);
-        code += DESCRIBE_SHELL_FINISH;
+        code += getTemplate('describe-shell-end');
 
         return writeToFile(output, code);
     }
@@ -136,11 +153,11 @@ function createNewFile(source, output, name, interactions) {
     logger.log('Writting new test file ' + output + JEST_EXTENSION);
     logger.skip();
     var relativePath = path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)), path.basename(source));
-    var code = [createDescribeShell(name, name, relativePath)];
+    var code = [createDescribeShell(name, name, relativePath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
     interactions.map(function (interaction) {
         return code.push(createItShell(interaction));
     });
-    code.push(DESCRIBE_SHELL_FINISH);
+    code.push(getTemplate('describe-shell-end'));
 
     return writeToFile(output, code.reduce(toSingleString));
 }
@@ -164,6 +181,7 @@ function parseInteraction(interaction) {
 
 function setupLogger(l) {
     logger = l || console;
+    /* eslint-disable */
     if (!logger.skip) logger.skip = function () {
         return console.log('Done.');
     };
@@ -173,6 +191,7 @@ function setupLogger(l) {
     if (!logger.pass) logger.pass = function () {
         return console.log('Success! \uD83C\uDF89');
     };
+    /* eslint-enable */
 }
 
 var JestSpeckPlugin = exports.JestSpeckPlugin = function () {

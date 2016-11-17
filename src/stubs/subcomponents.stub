@@ -1,0 +1,29 @@
+    it('should define its direct subcomponents', () => {
+        //  Arrange
+        const expectedSubComponents = [];
+        const wrapper = shallow(<%= className %>);
+
+        // Act
+
+        // Assert
+        expectedSubComponents.map(component =>
+            expect(wrapper.find(component).length)
+                .toBeGreaterThanOrEqualTo(1));
+    });
+
+    it('should pass props down to subcomponents', () => {
+        // Arrange
+        const expected = {};
+        const wrapper = mount(<%= className %>);
+
+        // Act
+
+        // Assert
+        Object.keys(expected).map(name => {
+            const subComponent = wrapper.find(name).at(0);
+            expect(subComponent.length).toBe(1);
+            Object.keys(expected[name]).map(prop =>
+                expect(subComponent.prop(prop))
+                    .toBe(expected[name][prop]));
+        });
+    });

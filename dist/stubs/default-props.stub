@@ -1,0 +1,11 @@
+    it('should validate correct default values for props', () => {
+        // Arrange
+        const expected = {};
+        const resulting = <%= className %>.defaultProps || {};
+
+        //  Act
+
+        // Assert
+        Object.keys(expected)
+            .map(prop => expect(resulting[prop]).toEqual(expected[prop]));
+    });
