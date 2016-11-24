@@ -1,6 +1,6 @@
 {
   "name": "mb3-jest-speck-plugin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A plugin for Speck that generates jest test shells",
   "main": "index.js",
   "scripts": {
