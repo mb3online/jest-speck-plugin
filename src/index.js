@@ -15,56 +15,54 @@
     'can create a new test file cleanly.'
   ]
 */
+/* eslint-disable no-magic-numbers */
 import _ from 'lodash';
 import * as fs from 'fs';
 import * as path from 'path';
 import mkdirp from 'mkdirp';
 
-import {SpeckPlugin} from 'mb3-speck';
-
-const ZERO = 0;
-
-const IT_SHELL = `
-\tit('<%= interaction %>', () => {
-\t\t// Arrange
-
-\t\t// Act
-
-\t\t// Assert
-
-\t\tfail('Test not implemented.');
-\t});`;
-const DESCRIBE_SHELL_START = `/* eslint-disable */
-import React from 'react';
-
-import { shallow, mount, render } from 'enzyme';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-
-import <%= className %> from '<%= relativePath %>';
-
-injectTapEventPlugin();
-
-describe('<%= name %>', () => {`;
-const DESCRIBE_SHELL_FINISH = `
-});
-`;
 const JEST_EXTENSION = `.spec.jsx`;
 let location;
 let logger;
 
+function getTemplate(name) {
+    return fs.readFileSync(path.join(__dirname, 'stubs', `${name}.stub`)).toString('utf8');
+}
+
+function renderTemplate(template, params) {
+    return _.template(getTemplate(template))(params);
+}
+
 function createItShell(interaction) {
-    return _.template(IT_SHELL)({ interaction: interaction }).replace(/\t/gmi, '    ');
+    return renderTemplate('it-shell', { interaction: interaction })
+        .replace(/\t/gmi, '    ');
 }
 
 function createDescribeShell(name, className, relativePath) {
     const rlp =
-    relativePath.split('/')[ZERO] === '..' ? relativePath : `./${relativePath}`;
+        relativePath.split('/')[0] === '..' ? relativePath : `./${relativePath}`;
 
-    return _.template(DESCRIBE_SHELL_START)({
+    return renderTemplate('describe-shell-start', {
         name: name,
         className: className,
         relativePath: rlp,
     });
+}
+
+function createRenderTestShell(className) {
+    return renderTemplate('render', { className: className });
+}
+
+function createSubComponentTestShell(className) {
+    return renderTemplate('subcomponents', { className: className });
+}
+
+function createPropTypesShell(className) {
+    return renderTemplate('prop-types', { className: className });
+}
+
+function createDefaultPropTypesShell(className) {
+    return renderTemplate('default-props', { className: className });
 }
 
 function normalizePath(output) {
@@ -83,9 +81,8 @@ function removeShellFinish(code) {
     const splitCode = code.split('\n');
     const end = splitCode.length - LAST;
 
-    return splitCode.splice(ZERO,
-    splitCode[end].charAt(ZERO) === '\n' ? end - SECOND_LAST : end - LAST)
-        .reduce(toSingleString);
+    return splitCode.splice(0,
+        splitCode[end].charAt(0) === '\n' ? end - SECOND_LAST : end - LAST).reduce(toSingleString);
 }
 
 function isImplemented(code, interaction) {
@@ -103,12 +100,11 @@ function appendToFile(output, name, its) {
     let code = removeShellFinish(rawCode);
     its = its.filter(interaction => isImplemented(code, interaction));
 
-  // something is new
-    if (its.length > ZERO) {
+    if (its.length > 0) {
         code += its
       .map(createItShell)
       .reduce(toSingleString);
-        code += DESCRIBE_SHELL_FINISH;
+        code += getTemplate('describe-shell-end');
 
         return writeToFile(output, code);
     }
@@ -139,9 +135,15 @@ function createNewFile(source, output, name, interactions) {
     const relativePath =
     path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)),
       path.basename(source));
-    const code = [createDescribeShell(name, name, relativePath)];
+    const code = [
+        createDescribeShell(name, name, relativePath),
+        createRenderTestShell(name),
+        createSubComponentTestShell(name),
+        createDefaultPropTypesShell(name),
+        createPropTypesShell(name),
+    ];
     interactions.map(interaction => code.push(createItShell(interaction)));
-    code.push(DESCRIBE_SHELL_FINISH);
+    code.push(getTemplate('describe-shell-end'));
 
     return writeToFile(output, code.reduce(toSingleString));
 }
@@ -168,9 +170,11 @@ function parseInteraction(interaction) {
 
 function setupLogger(l) {
     logger = l || console;
+    /* eslint-disable */
     if (!logger.skip) logger.skip = () => console.log('Done.');
     if (!logger.write) logger.write = message => console.log(`Writing: ${message}.`);
     if (!logger.pass) logger.pass = () => console.log(`Success! 🎉`);
+    /* eslint-enable */
 }
 
 export class JestSpeckPlugin {

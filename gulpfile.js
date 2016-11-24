@@ -8,7 +8,11 @@ const istanbul = require('gulp-istanbul');
 
 gulp.task('default', [ 'build', 'test' ]);
 
-gulp.task('build', ['build:src']);
+gulp.task('build', [ 'build:src', 'build:stubs' ]);
+
+gulp.task('build:stubs', () =>
+    gulp.src('src/stubs/*')
+        .pipe(gulp.dest('dist/stubs')));
 
 gulp.task('build:src', () =>
     gulp.src('src/**/*.js')

@@ -90,7 +90,8 @@ describe('Jest Speck Plugin', () => {
                     ],
                 });
 
-            expect(fs.readFileSync(path.resolve('spec', 'index.spec.jsx'), 'utf8').includes('this is a new interaction')).toBeTruthy();
+            expect(fs.readFileSync(path.resolve('spec', 'index.spec.jsx'), 'utf8')
+                .includes('this is a new interaction')).toBeTruthy();
 
             done();
         });

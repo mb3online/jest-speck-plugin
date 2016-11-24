@@ -1,0 +1,11 @@
+    it('should validate correct prop types', () => {
+        // Arrange
+        const expected = {};
+        const resulting = <%= className %>.propTypes || {};
+
+        //  Act
+
+        // Assert
+        Object.keys(expected)
+            .map(prop => expect(resulting[prop]).toEqual(expected[prop]));
+    });

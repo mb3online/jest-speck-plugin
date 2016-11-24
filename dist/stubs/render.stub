@@ -1,0 +1,9 @@
+    it('should render the component', () => {
+        // Arrange
+        const wrapper = mount(<%= className %>);
+
+        // Act
+
+        // Assert
+        expect(wrapper.length).toEqual(1);
+    });

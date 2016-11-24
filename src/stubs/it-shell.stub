@@ -1,0 +1,8 @@
+    it('<%= interaction %>', () => {
+        // Arrange
+
+        // Act
+
+        // Assert
+        fail('Test not implemented.');
+    });
