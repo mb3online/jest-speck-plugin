@@ -29,7 +29,7 @@ function getTemplate(name) {
     return fs.readFileSync(path.join(__dirname, 'stubs', `${name}.stub`)).toString('utf8');
 }
 
-function renderTemplate(template, params) {    
+function renderTemplate(template, params) {
     return _.template(getTemplate(template))(params);
 }
 
