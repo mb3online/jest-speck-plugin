@@ -29,7 +29,7 @@ function getTemplate(name) {
     return fs.readFileSync(path.join(__dirname, 'stubs', `${name}.stub`)).toString('utf8');
 }
 
-function renderTemplate(template, params) {
+function renderTemplate(template, params) {    
     return _.template(getTemplate(template))(params);
 }
 
@@ -38,7 +38,7 @@ function createItShell(interaction) {
         .replace(/\t/gmi, '    ');
 }
 
-function createDescribeShell(name, className, relativePath) {
+function createDescribeShell(name, className, relativePath, relativeLibPath) {
     const rlp =
         relativePath.split('/')[0] === '..' ? relativePath : `./${relativePath}`;
 
@@ -46,6 +46,7 @@ function createDescribeShell(name, className, relativePath) {
         name: name,
         className: className,
         relativePath: rlp,
+        relativeLibPath: relativeLibPath,
     });
 }
 
@@ -135,8 +136,19 @@ function createNewFile(source, output, name, interactions) {
     const relativePath =
     path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)),
       path.basename(source));
+      
+    let relativeLibPath = '';
+    let folders = path.parse(source).dir.split(path.sep).reverse();
+    
+    for(let ii = 0; ii < folders.length; ii++){
+        logger.log(folders[ii]);
+        if(folders[ii] == 'lib') break;
+        
+        relativeLibPath += '../'; 
+    }
+    
     const code = [
-        createDescribeShell(name, name, relativePath),
+        createDescribeShell(name, name, relativePath, relativeLibPath),
         createRenderTestShell(name),
         createSubComponentTestShell(name),
         createDefaultPropTypesShell(name),
