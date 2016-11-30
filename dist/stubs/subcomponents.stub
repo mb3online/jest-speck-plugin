@@ -13,17 +13,16 @@
 
     it('should pass props down to subcomponents', () => {
         // Arrange
-        const expected = {};
+        const expectedProps = {};
         const wrapper = mount(<%= className %>);
 
         // Act
 
         // Assert
-        Object.keys(expected).map(name => {
-            const subComponent = wrapper.find(name).at(0);
+        Object.keys(expectedProps).map(subComponentName => {
+            const subComponent = wrapper.find(subComponentName).at(0);
+
             expect(subComponent.length).toBe(1);
-            Object.keys(expected[name]).map(prop =>
-                expect(subComponent.prop(prop))
-                    .toBe(expected[name][prop]));
+            expect(subComponent.props()).toContainSubset(expectedProps[subComponentName]);
         });
     });
