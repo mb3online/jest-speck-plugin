@@ -48,7 +48,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var JEST_EXTENSION = '.spec.jsx';
-var location = void 0;
+var options = void 0;
 var logger = void 0;
 
 function getTemplate(name) {
@@ -63,14 +63,14 @@ function createItShell(interaction) {
     return renderTemplate('it-shell', { interaction: interaction }).replace(/\t/gmi, '    ');
 }
 
-function createDescribeShell(name, className, relativePath, relativeLibPath) {
+function createDescribeShell(name, className, relativePath, relativeRootPath) {
     var rlp = relativePath.split('/')[0] === '..' ? relativePath : './' + relativePath;
 
     return renderTemplate('describe-shell-start', {
         name: name,
         className: className,
         relativePath: rlp,
-        relativeLibPath: relativeLibPath
+        relativeRootPath: relativeRootPath
     });
 }
 
@@ -91,7 +91,11 @@ function createDefaultPropTypesShell(className) {
 }
 
 function normalizePath(output) {
-    if (!location || location === 'base') return '' + output + JEST_EXTENSION;else return path.join(location, '' + path.basename(output) + JEST_EXTENSION);
+    var _options = options,
+        outputPath = _options.outputPath;
+
+
+    if (!outputPath || outputPath === 'base') return '' + output + JEST_EXTENSION;else return path.join(outputPath, '' + path.basename(output) + JEST_EXTENSION);
 }
 
 function readTestFile(name) {
@@ -133,13 +137,17 @@ function appendToFile(output, name, its) {
 }
 
 function writeToFile(output, code) {
+    var _options2 = options,
+        outputPath = _options2.outputPath;
+
+
     logger.write('' + output + JEST_EXTENSION);
 
-    if (location !== 'base') {
+    if (outputPath !== 'base') {
         try {
-            fs.lstatSync(location);
+            fs.lstatSync(outputPath);
         } catch (e) {
-            _mkdirp2.default.sync(location);
+            _mkdirp2.default.sync(outputPath);
         }
     }
 
@@ -151,17 +159,24 @@ function writeToFile(output, code) {
 }
 
 function createNewFile(source, output, name, interactions) {
+    var _options3 = options,
+        root = _options3.root;
+
+
     logger.log('Writting new test file ' + output + JEST_EXTENSION);
     logger.skip();
     var relativePath = path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)), path.basename(source));
 
-    var relativeLibPath = './';
-    try {
-        fs.accessSync(path.resolve('lib/components'));
-        relativeLibPath = path.relative(source, path.resolve('lib/components')) + '/';
-    } catch (e) {}
+    var relativeRootPath = './';
 
-    var code = [createDescribeShell(name, name, relativePath, relativeLibPath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
+    if (root) {
+        try {
+            fs.accessSync(path.resolve(root));
+            relativeRootPath = path.relative(source, path.resolve(root)) + '/';
+        } catch (e) {}
+    }
+
+    var code = [createDescribeShell(name, name, relativePath, relativeRootPath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
     interactions.map(function (interaction) {
         return code.push(createItShell(interaction));
     });
@@ -171,8 +186,12 @@ function createNewFile(source, output, name, interactions) {
 }
 
 function testFileExists(output) {
+    var _options4 = options,
+        outputPath = _options4.outputPath;
+
+
     try {
-        return fs.lstatSync(path.resolve(location, '' + output + JEST_EXTENSION)).isFile();
+        return fs.lstatSync(path.resolve(outputPath, '' + output + JEST_EXTENSION)).isFile();
     } catch (e) {
         return false;
     }
@@ -203,12 +222,10 @@ function setupLogger(l) {
 }
 
 var JestSpeckPlugin = exports.JestSpeckPlugin = function () {
-    function JestSpeckPlugin() {
-        var testFileLocation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'base';
-
+    function JestSpeckPlugin(opts) {
         _classCallCheck(this, JestSpeckPlugin);
 
-        location = testFileLocation;
+        options = Object.assign({ outputPath: 'base' }, opts);
     }
 
     _createClass(JestSpeckPlugin, [{
@@ -224,6 +241,7 @@ var JestSpeckPlugin = exports.JestSpeckPlugin = function () {
             logger.log('Generating test file for ' + json.name + '.');
             var interactions = this.parse(json.interactions || []);
             var output = path.join(path.dirname(file), path.basename(file, path.parse(file).ext));
+
             if (!testFileExists(output)) {
                 return createNewFile(file, output, json.name, interactions);
             }

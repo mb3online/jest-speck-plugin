@@ -13,6 +13,12 @@ describe('Jest Speck Plugin', () => {
             new JestSpeckPlugin(),
         ]);
     });
+    
+    afterEach(() => {
+      const root = path.join(__dirname, '..');
+      try { fs.unlinkSync(path.join(root, 'spec', 'helpers', 'index.spec.jsx')); }
+      catch (e) {}
+    });
 
     afterAll(() => {
         const root = path.join(__dirname, '..');
@@ -44,7 +50,7 @@ describe('Jest Speck Plugin', () => {
 
             const json = JSON.parse(parser.parseSingleFile(file));
 
-            const jestPlugin = new JestSpeckPlugin('spec');
+            const jestPlugin = new JestSpeckPlugin({ outputPath: 'spec' });
 
             jestPlugin.run(null, path.resolve('src', file), json);
 
@@ -69,7 +75,7 @@ describe('Jest Speck Plugin', () => {
   );
 
     it('should be able to append to a file cleanly.', done => {
-        const jestPlugin = new JestSpeckPlugin('spec');
+        const jestPlugin = new JestSpeckPlugin({ outputPath: 'spec' });
 
         parser.gather(files => {
             const file = files
@@ -149,7 +155,7 @@ describe('Jest Speck Plugin', () => {
 
     it('should create directory structure if it doesn\'t exist.', () => {
         const filePath = 'scripts/is/a/made/up/path';
-        const jestPlugin = new JestSpeckPlugin(filePath);
+        const jestPlugin = new JestSpeckPlugin({ outputPath: filePath });
 
         jestPlugin.run(null, path.resolve('script'), {
             'name': 'test',
@@ -162,5 +168,48 @@ describe('Jest Speck Plugin', () => {
             .toBeTruthy();
 
         rimraf(path.resolve('scripts/is'), err => console.log(err));
+    });
+    
+    it('should use the default root path', () => {
+      const jestPlugin = new JestSpeckPlugin();
+      
+      jestPlugin.run(null, path.resolve('spec', 'helpers', 'index.js'), {
+        'name': 'test',
+        'interactions': [
+            'can yolo',
+        ],
+      });
+      
+      expect(fs.readFileSync(path.resolve('spec', 'helpers', 'index.spec.jsx')).toString('utf8').includes('import { render, shallow, mount } from \'./utils/enzyme/mounting.js\';')).toBeTruthy();
+    });
+    
+    it('should use the default root path if path is invalid', () => {
+      const rootPath = 'not/a/valid/path';
+      const jestPlugin = new JestSpeckPlugin({
+        root: rootPath
+      });
+      
+      jestPlugin.run(null, path.resolve('spec', 'helpers', 'index.js'), {
+        'name': 'test',
+        'interactions': [
+            'can yolo',
+        ],
+      });
+      
+      expect(fs.readFileSync(path.resolve('spec', 'helpers', 'index.spec.jsx')).toString('utf8').includes('import { render, shallow, mount } from \'./utils/enzyme/mounting.js\';')).toBeTruthy();
+    });
+    
+    it('should allow a root path config variable', () => {
+      const rootPath = 'src/stubs';
+      const jestPlugin = new JestSpeckPlugin({ root: rootPath });
+      
+      jestPlugin.run(null, path.resolve('spec', 'helpers', 'index.js'), {
+        'name': 'test',
+        'interactions': [
+            'can yolo',
+        ],
+      });
+      
+      expect(fs.readFileSync(path.resolve('spec', 'helpers', 'index.spec.jsx')).toString('utf8').includes(path.relative(path.resolve('spec', 'helpers', 'index.js'), path.resolve(rootPath)))).toBeTruthy();
     });
 });
