@@ -139,12 +139,10 @@ function createNewFile(source, output, name, interactions) {
       
     
     let relativeLibPath = './';
-    try{
+    try {
         fs.accessSync(path.resolve('lib/components'));
         relativeLibPath = `${path.relative(source, path.resolve('lib/components'))}/`;
-    }catch(e){
-        ; //do nothing
-    }
+    } catch(e) {}
     
     const code = [
         createDescribeShell(name, name, relativePath, relativeLibPath),
