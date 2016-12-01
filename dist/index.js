@@ -63,13 +63,14 @@ function createItShell(interaction) {
     return renderTemplate('it-shell', { interaction: interaction }).replace(/\t/gmi, '    ');
 }
 
-function createDescribeShell(name, className, relativePath) {
+function createDescribeShell(name, className, relativePath, relativeLibPath) {
     var rlp = relativePath.split('/')[0] === '..' ? relativePath : './' + relativePath;
 
     return renderTemplate('describe-shell-start', {
         name: name,
         className: className,
-        relativePath: rlp
+        relativePath: rlp,
+        relativeLibPath: relativeLibPath
     });
 }
 
@@ -153,7 +154,14 @@ function createNewFile(source, output, name, interactions) {
     logger.log('Writting new test file ' + output + JEST_EXTENSION);
     logger.skip();
     var relativePath = path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)), path.basename(source));
-    var code = [createDescribeShell(name, name, relativePath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
+
+    var relativeLibPath = './';
+    try {
+        fs.accessSync(path.resolve('lib/components'));
+        relativeLibPath = path.relative(source, path.resolve('lib/components')) + '/';
+    } catch (e) {}
+
+    var code = [createDescribeShell(name, name, relativePath, relativeLibPath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
     interactions.map(function (interaction) {
         return code.push(createItShell(interaction));
     });
