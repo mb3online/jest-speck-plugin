@@ -38,7 +38,7 @@ function createItShell(interaction) {
         .replace(/\t/gmi, '    ');
 }
 
-function createDescribeShell(name, className, relativePath) {
+function createDescribeShell(name, className, relativePath, relativeLibPath) {
     const rlp =
         relativePath.split('/')[0] === '..' ? relativePath : `./${relativePath}`;
 
@@ -46,6 +46,7 @@ function createDescribeShell(name, className, relativePath) {
         name: name,
         className: className,
         relativePath: rlp,
+        relativeLibPath: relativeLibPath,
     });
 }
 
@@ -135,8 +136,18 @@ function createNewFile(source, output, name, interactions) {
     const relativePath =
     path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)),
       path.basename(source));
+      
+    
+    let relativeLibPath = './';
+    try{
+        fs.accessSync(path.resolve('lib/components'));
+        relativeLibPath = `${path.relative(source, path.resolve('lib/components'))}/`;
+    }catch(e){
+        ; //do nothing
+    }
+    
     const code = [
-        createDescribeShell(name, name, relativePath),
+        createDescribeShell(name, name, relativePath, relativeLibPath),
         createRenderTestShell(name),
         createSubComponentTestShell(name),
         createDefaultPropTypesShell(name),
