@@ -1,11 +1,16 @@
 import React from 'react';
 
+import ReactTestUtils from 'react-addons-test-utils';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import <%= className %> from '<%= relativePath %>';
 import { render, shallow, mount } from '<%= relativeLibPath %>utils/enzyme/mounting.js';
+import matchers from '<%= relativeLibPath %>utils/matchers.js';
 
 injectTapEventPlugin();
 
 describe('<%= name %>', () => {
+    beforeEach(() => {
+        jasmine.addMatchers(matchers(ReactTestUtils));
+    });
     
