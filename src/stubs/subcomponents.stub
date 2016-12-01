@@ -1,7 +1,7 @@
     it('should define its direct subcomponents', () => {
         //  Arrange
         const expectedSubComponents = [];
-        const wrapper = shallow(<%= className %>);
+        const wrapper = shallow(<<%= className %> />);
 
         // Act
 
@@ -14,7 +14,7 @@
     it('should pass props down to subcomponents', () => {
         // Arrange
         const expectedProps = {};
-        const wrapper = mount(<%= className %>);
+        const wrapper = mount(<<%= className %> />);
 
         // Act
 
