@@ -157,11 +157,9 @@ function createNewFile(source, output, name, interactions) {
 
     var relativeLibPath = './';
     try {
-        fs.accessSync(path.resolve('lisdf'));
+        fs.accessSync(path.resolve('lib/components'));
         relativeLibPath = path.relative(source, path.resolve('lib/components')) + '/';
-    } catch (e) {
-        ; //do nothing
-    }
+    } catch (e) {}
 
     var code = [createDescribeShell(name, name, relativePath, relativeLibPath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
     interactions.map(function (interaction) {
