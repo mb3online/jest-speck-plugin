@@ -29,7 +29,7 @@ function getTemplate(name) {
     return fs.readFileSync(path.join(__dirname, 'stubs', `${name}.stub`)).toString('utf8');
 }
 
-function renderTemplate(template, params) {    
+function renderTemplate(template, params) {
     return _.template(getTemplate(template))(params);
 }
 
@@ -137,15 +137,12 @@ function createNewFile(source, output, name, interactions) {
     path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)),
       path.basename(source));
       
-    let relativeLibPath = '';
-    let folders = path.parse(source).dir.split(path.sep).reverse();
     
-    for(let ii = 0; ii < folders.length; ii++){
-        logger.log(folders[ii]);
-        if(folders[ii] == 'lib') break;
-        
-        relativeLibPath += '../'; 
-    }
+    let relativeLibPath = './';
+    try {
+        fs.accessSync(path.resolve('lib/components'));
+        relativeLibPath = `${path.relative(source, path.resolve('lib/components'))}/`;
+    } catch(e) {}
     
     const code = [
         createDescribeShell(name, name, relativePath, relativeLibPath),

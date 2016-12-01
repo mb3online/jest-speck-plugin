@@ -155,15 +155,11 @@ function createNewFile(source, output, name, interactions) {
     logger.skip();
     var relativePath = path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)), path.basename(source));
 
-    var relativeLibPath = '';
-    var folders = path.parse(source).dir.split(path.sep).reverse();
-
-    for (var ii = 0; ii < folders.length; ii++) {
-        logger.log(folders[ii]);
-        if (folders[ii] == 'lib') break;
-
-        relativeLibPath += '../';
-    }
+    var relativeLibPath = './';
+    try {
+        fs.accessSync(path.resolve('lib/components'));
+        relativeLibPath = path.relative(source, path.resolve('lib/components')) + '/';
+    } catch (e) {}
 
     var code = [createDescribeShell(name, name, relativePath, relativeLibPath), createRenderTestShell(name), createSubComponentTestShell(name), createDefaultPropTypesShell(name), createPropTypesShell(name)];
     interactions.map(function (interaction) {
