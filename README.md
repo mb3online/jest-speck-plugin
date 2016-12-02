@@ -5,3 +5,10 @@
 [![Test Coverage](https://codeclimate.com/github/mb3online/jest-speck-plugin/badges/coverage.svg)](https://codeclimate.com/github/mb3online/jest-speck-plugin/coverage)
 
 A Plugin to generate jest test shells from [Speck](https://npmjs.org/packages/mb3-speck) formatted leading comments that include an interactions list.
+
+## Options
+- `outputPath [string]`: The path to write the `.spec.jsx` files.
+> Default `"<Source Directory>"`
+
+- `root [string]`: The top level of the components directory
+> Default `"./"`

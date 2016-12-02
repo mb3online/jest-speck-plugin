@@ -22,7 +22,7 @@ import * as path from 'path';
 import mkdirp from 'mkdirp';
 
 const JEST_EXTENSION = `.spec.jsx`;
-let location;
+let options;
 let logger;
 
 function getTemplate(name) {
@@ -38,7 +38,7 @@ function createItShell(interaction) {
         .replace(/\t/gmi, '    ');
 }
 
-function createDescribeShell(name, className, relativePath) {
+function createDescribeShell(name, className, relativePath, relativeRootPath) {
     const rlp =
         relativePath.split('/')[0] === '..' ? relativePath : `./${relativePath}`;
 
@@ -46,6 +46,7 @@ function createDescribeShell(name, className, relativePath) {
         name: name,
         className: className,
         relativePath: rlp,
+        relativeRootPath: relativeRootPath,
     });
 }
 
@@ -66,9 +67,11 @@ function createDefaultPropTypesShell(className) {
 }
 
 function normalizePath(output) {
-    if (!location || location === 'base')
+    const { outputPath } = options;
+    
+    if (!outputPath || outputPath === 'base')
         return `${output}${JEST_EXTENSION}`;
-    else return path.join(location, `${path.basename(output)}${JEST_EXTENSION}`);
+    else return path.join(outputPath, `${path.basename(output)}${JEST_EXTENSION}`);
 }
 
 function readTestFile(name) {
@@ -111,13 +114,15 @@ function appendToFile(output, name, its) {
 }
 
 function writeToFile(output, code) {
+    const { outputPath } = options;
+    
     logger.write(`${output}${JEST_EXTENSION}`);
 
-    if (location !== 'base') {
+    if (outputPath !== 'base') {
         try {
-            fs.lstatSync(location);
+            fs.lstatSync(outputPath);
         } catch (e) {
-            mkdirp.sync(location);
+            mkdirp.sync(outputPath);
         }
     }
 
@@ -130,13 +135,25 @@ function writeToFile(output, code) {
 }
 
 function createNewFile(source, output, name, interactions) {
+    const { root } = options;
+    
     logger.log(`Writting new test file ${output}${JEST_EXTENSION}`);
     logger.skip();
     const relativePath =
     path.join(path.relative(path.resolve(path.dirname(output)), path.dirname(source)),
       path.basename(source));
+      
+    let relativeRootPath = './';
+    
+    if (root){
+        try {
+            fs.accessSync(path.resolve(root));
+            relativeRootPath = `${path.relative(source, path.resolve(root))}/`;
+        } catch(e) {}
+    }
+    
     const code = [
-        createDescribeShell(name, name, relativePath),
+        createDescribeShell(name, name, relativePath, relativeRootPath),
         createRenderTestShell(name),
         createSubComponentTestShell(name),
         createDefaultPropTypesShell(name),
@@ -149,8 +166,10 @@ function createNewFile(source, output, name, interactions) {
 }
 
 function testFileExists(output) {
+    const { outputPath } = options;
+    
     try {
-        return fs.lstatSync(path.resolve(location, `${output}${JEST_EXTENSION}`))
+        return fs.lstatSync(path.resolve(outputPath, `${output}${JEST_EXTENSION}`))
             .isFile();
     } catch (e) {
         return false;
@@ -178,8 +197,8 @@ function setupLogger(l) {
 }
 
 export class JestSpeckPlugin {
-    constructor(testFileLocation = 'base') {
-        location = testFileLocation;
+    constructor(opts) {
+        options = Object.assign({ outputPath: 'base' }, opts);
     }
 
     parse(interactions) {
@@ -192,6 +211,7 @@ export class JestSpeckPlugin {
         logger.log(`Generating test file for ${json.name}.`);
         const interactions = this.parse(json.interactions || []);
         const output = path.join(path.dirname(file), path.basename(file, path.parse(file).ext));
+
         if (!testFileExists(output)) {
             return createNewFile(file, output, json.name, interactions);
         }

@@ -1,6 +1,6 @@
     it('should render the component', () => {
         // Arrange
-        const wrapper = mount(<%= className %>);
+        const wrapper = mount(<<%= className %> />);
 
         // Act
 
