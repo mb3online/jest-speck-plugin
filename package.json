@@ -1,6 +1,6 @@
 {
   "name": "mb3-jest-speck-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A plugin for Speck that generates jest test shells",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
   },
   "author": "MB3 Technologies Inc",
   "contributors": [
-    "Eric Adamski <eric.adamski@mb3online.com>"
+    "Eric Adamski <eric.adamski@mb3online.com>",
+    "Patrick Vienneau <patrick.vienneau@mb3online.com>"
   ],
   "license": "MIT",
   "devDependencies": {
