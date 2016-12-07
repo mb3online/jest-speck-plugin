@@ -170,9 +170,10 @@ function createNewFile(source, output, name, interactions) {
     var relativeRootPath = './';
 
     if (root) {
+        var rootPath = path.resolve(root);
         try {
-            fs.accessSync(path.resolve(root));
-            relativeRootPath = path.relative(source, path.resolve(root)) + '/';
+            fs.accessSync(rootPath);
+            relativeRootPath = path.relative(path.dirname(source), rootPath) + '/';
         } catch (e) {}
     }
 

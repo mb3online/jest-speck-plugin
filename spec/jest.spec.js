@@ -209,7 +209,7 @@ describe('Jest Speck Plugin', () => {
             'can yolo',
         ],
       });
-      
-      expect(fs.readFileSync(path.resolve('spec', 'helpers', 'index.spec.jsx')).toString('utf8').includes(path.relative(path.resolve('spec', 'helpers', 'index.js'), path.resolve(rootPath)))).toBeTruthy();
+
+      expect(fs.readFileSync(path.resolve('spec', 'helpers', 'index.spec.jsx')).toString('utf8').includes(path.relative(path.resolve('spec', 'helpers'), path.resolve(rootPath)))).toBeTruthy();
     });
 });
