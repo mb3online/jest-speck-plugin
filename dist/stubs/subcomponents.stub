@@ -8,7 +8,7 @@
         // Assert
         expectedSubComponents.map(component =>
             expect(wrapper.find(component).length)
-                .toBeGreaterThanOrEqualTo(1));
+                .toBeGreaterThanOrEqual(1));
     });
 
     it('should pass props down to subcomponents', () => {
