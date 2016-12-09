@@ -3,7 +3,7 @@ import React from 'react';
 import ReactTestUtils from 'react-addons-test-utils';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import <%= className %> from '<%= relativePath %>';
+import * as usages from ./usages;
 import { render, shallow, mount } from '<%= relativeRootPath %>utils/enzyme/mounting.js';
 import matchers from '<%= relativeRootPath %>utils/matchers.js';
 
@@ -13,4 +13,3 @@ describe('<%= name %>', () => {
     beforeEach(() => {
         jasmine.addMatchers(matchers(ReactTestUtils));
     });
-    
