@@ -146,9 +146,10 @@ function createNewFile(source, output, name, interactions) {
     let relativeRootPath = './';
     
     if (root){
+        const rootPath = path.resolve(root);
         try {
-            fs.accessSync(path.resolve(root));
-            relativeRootPath = `${path.relative(source, path.resolve(root))}/`;
+            fs.accessSync(rootPath);
+            relativeRootPath = `${path.relative(path.dirname(source), rootPath)}/`;
         } catch(e) {}
     }
     
