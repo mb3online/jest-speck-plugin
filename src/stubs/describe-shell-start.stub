@@ -5,7 +5,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import * as usages from ./usages;
 import { render, shallow, mount } from '<%= relativeRootPath %>utils/enzyme/mounting.js';
-import matchers from '<%= relativeRootPath %>utils/matchers.js';
+import matchers from '<%= relativeRootPath %>utils/jasmine/matchers.js';
 
 injectTapEventPlugin();
 
